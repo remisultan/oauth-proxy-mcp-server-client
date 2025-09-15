@@ -3,7 +3,7 @@ click>=8.1.3
 pydantic>=2.5.1
 pydantic-settings>=2.0.3
 
-# MCP SDK (server + client)
+# MCP SDK (mcp_resource_server + client)
 mcp>=0.1.0  # adjust version to your MCP SDK version
 
 # HTTP clients

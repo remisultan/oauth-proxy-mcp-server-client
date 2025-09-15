@@ -93,7 +93,7 @@ class IntrospectionTokenVerifier(TokenVerifier):
                 return None
 
     def _validate_resource(self, token_data: dict[str, Any]) -> bool:
-        """Validate token was issued for this resource server."""
+        """Validate token was issued for this resource mcp_resource_server."""
         if not self.server_url or not self.resource_url:
             return False  # Fail if strict validation requested but URLs missing
 
@@ -111,7 +111,7 @@ class IntrospectionTokenVerifier(TokenVerifier):
         return False
 
     def _is_valid_resource(self, resource: str) -> bool:
-        """Check if resource matches this server using hierarchical matching."""
+        """Check if resource matches this mcp_resource_server using hierarchical matching."""
         if not self.resource_url:
             return False
 
