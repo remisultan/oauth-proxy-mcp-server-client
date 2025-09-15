@@ -1,3 +1,4 @@
+import getpass
 import webbrowser
 from mcp.client.auth import OAuthClientProvider
 from mcp.shared.auth import OAuthClientMetadata
@@ -5,7 +6,7 @@ from storage import InMemoryTokenStorage
 from callback import CallbackServer
 
 
-def create_oauth_provider(server_url: str) -> OAuthClientProvider:
+def create_oauth_provider(server_url: str, scopes:list[str]) -> OAuthClientProvider:
     """Factory for OAuthClientProvider with default redirect/callback handling."""
     callback_server = CallbackServer(port=3030)
     callback_server.start()
@@ -22,10 +23,11 @@ def create_oauth_provider(server_url: str) -> OAuthClientProvider:
 
     client_metadata = OAuthClientMetadata.model_validate(
         {
-            "client_name": "Simple Auth Client",
+            "client_name": f"{getpass.getuser()}'s client",
             "redirect_uris": ["http://localhost:3030/callback"],
             "grant_types": ["authorization_code", "refresh_token"],
             "response_types": ["code"],
+            "scope": " ".join(scopes),
             "token_endpoint_auth_method": "client_secret_post",
         }
     )
@@ -33,7 +35,7 @@ def create_oauth_provider(server_url: str) -> OAuthClientProvider:
     return OAuthClientProvider(
         server_url=server_url.replace("/mcp", ""),
         client_metadata=client_metadata,
-        storage=InMemoryTokenStorage(),
         redirect_handler=redirect_handler,
+        storage=InMemoryTokenStorage(),
         callback_handler=callback_handler,
     )

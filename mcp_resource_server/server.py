@@ -30,7 +30,7 @@ def create_resource_server(settings: ResourceServerSettings) -> FastMCP:
         token_verifier=token_verifier,
         auth=AuthSettings(
             issuer_url=settings.gravitee_am_url,
-            required_scopes=[],
+            required_scopes=["openid", "full_profile"],
             resource_server_url=settings.server_url,
         ),
     )

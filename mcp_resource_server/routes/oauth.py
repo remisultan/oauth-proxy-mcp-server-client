@@ -4,7 +4,6 @@ from pathlib import Path
 import httpx
 from urllib.parse import urlencode
 from starlette.responses import JSONResponse, RedirectResponse
-from starlette.status import HTTP_400_BAD_REQUEST
 
 CREDENTIALS_FILE = Path.home() / ".mcp_server" / "client_credentials.json"
 

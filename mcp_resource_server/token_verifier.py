@@ -100,7 +100,7 @@ class IntrospectionTokenVerifier(TokenVerifier):
                 return AccessToken(
                     token=token,
                     client_id=data.get("client_id", self.client_id),
-                    scopes=[data['username']],
+                    scopes=data.get("scope").split(" "),
                     expires_at=data.get("exp"),
                     resource=data.get("aud"),
                 )

@@ -17,7 +17,7 @@ class SimpleAuthClient:
     async def connect(self):
         print(f"🔗 Connecting to {self.server_url} with {self.transport_type}...")
 
-        oauth_provider = create_oauth_provider(self.server_url)
+        oauth_provider = create_oauth_provider(self.server_url, scopes=["openid", "full_profile"])
 
         if self.transport_type == "sse":
             async with sse_client(self.server_url, auth=oauth_provider) as (r, w):
