@@ -1,12 +1,14 @@
 """Example token verifier implementation using OAuth 2.0 Token Introspection (RFC 7662)."""
-
+import json
 import logging
+from pathlib import Path
 from typing import Any
 
 from mcp.server.auth.provider import AccessToken, TokenVerifier
 from mcp.shared.auth_utils import check_resource_allowed, resource_url_from_server_url
 
 logger = logging.getLogger(__name__)
+DEFAULT_CREDENTIALS_PATH = Path.home() / ".mcp_server" / "client_credentials.json"
 
 
 class IntrospectionTokenVerifier(TokenVerifier):
@@ -34,10 +36,24 @@ class IntrospectionTokenVerifier(TokenVerifier):
         self.client_id: str | None = None
         self.client_secret: str | None = None
 
-    def set_client_credentials(self, client_id: str, client_secret: str):
-        """Update the client credentials used for introspection."""
+    def set_client_credentials(
+        self, client_id: str, client_secret: str
+    ):
+        """Update the client credentials (optionally persisting them to disk)."""
         self.client_id = client_id
         self.client_secret = client_secret
+
+    def load_client_credentials(self, file_path: Path = DEFAULT_CREDENTIALS_PATH):
+        """Load client_id and client_secret from a JSON file."""
+        if file_path.exists():
+            logger.info(f"Loading credentials from {file_path}")
+            with file_path.open("r") as f:
+                creds = json.load(f)
+
+            self.set_client_credentials(
+                creds.get("client_id"),
+                creds.get("client_secret")
+            )
 
     async def verify_token(self, token: str) -> AccessToken | None:
         """Verify token via introspection endpoint."""

@@ -19,6 +19,8 @@ def create_resource_server(settings: ResourceServerSettings) -> FastMCP:
         validate_resource=settings.oauth_strict,
     )
 
+    token_verifier.load_client_credentials()
+
     mcp = FastMCP(
         name="MCP Resource Server",
         instructions="Validates tokens via Gravitee AM introspection",
