@@ -1,0 +1,25 @@
+# General dependencies
+click>=8.1.3
+pydantic>=2.5.1
+pydantic-settings>=2.0.3
+
+# MCP SDK (server + client)
+mcp>=0.1.0  # adjust version to your MCP SDK version
+
+# HTTP clients
+httpx>=0.28.1
+aiohttp>=3.8.6
+sseclient-py>=1.7.2
+
+# OAuth support
+authlib>=1.2.1
+
+# Optional for typing and development
+typing-extensions>=4.9.0
+
+# Logging
+uvicorn>=0.23.2
+
+# For testing and async support
+pytest>=8.4.0
+pytest-asyncio>=0.22.0
