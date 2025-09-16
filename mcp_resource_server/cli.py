@@ -28,6 +28,7 @@ def main(port: int, gravitee_am: str, transport: Literal["sse", "streamable-http
             server_url=AnyHttpUrl(f"http://localhost:{port}"),
             gravitee_am_url=am_url,
             gravitee_am_introspection_endpoint=f"{gravitee_am}/oauth/introspect",
+            gravitee_am_userinfo_endpoint=f"{gravitee_am}/oidc/userinfo",
             oauth_strict=oauth_strict,
         )
     except ValueError as e:

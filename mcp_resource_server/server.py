@@ -15,6 +15,7 @@ def create_resource_server(settings: ResourceServerSettings) -> FastMCP:
 
     token_verifier = IntrospectionTokenVerifier(
         introspection_endpoint=settings.gravitee_am_introspection_endpoint,
+        userinfo_endpoint=settings.gravitee_am_userinfo_endpoint,
         server_url=str(settings.server_url),
         validate_resource=settings.oauth_strict,
     )

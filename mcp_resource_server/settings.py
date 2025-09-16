@@ -14,6 +14,7 @@ class ResourceServerSettings(BaseSettings):
 
     gravitee_am_url: AnyHttpUrl = AnyHttpUrl("http://localhost:8092")
     gravitee_am_introspection_endpoint: str = "http://localhost:8092/oauth/introspect"
+    gravitee_am_userinfo_endpoint: str = "http://localhost:8092/oidc/userinfo"
 
     # OAuth2 / MCP
     mcp_scope: str = "username"

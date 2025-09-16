@@ -10,6 +10,8 @@ from mcp.shared.auth_utils import check_resource_allowed, resource_url_from_serv
 logger = logging.getLogger(__name__)
 DEFAULT_CREDENTIALS_PATH = Path.home() / ".mcp_server" / "client_credentials.json"
 
+class AccessTokenWithClaims(AccessToken):
+    claims: dict
 
 class IntrospectionTokenVerifier(TokenVerifier):
     """Example token verifier that uses OAuth 2.0 Token Introspection (RFC 7662).
@@ -25,10 +27,12 @@ class IntrospectionTokenVerifier(TokenVerifier):
     def __init__(
         self,
         introspection_endpoint: str,
+        userinfo_endpoint: str,
         server_url: str,
         validate_resource: bool = False,
     ):
         self.introspection_endpoint = introspection_endpoint
+        self.userinfo_endpoint = userinfo_endpoint
         self.server_url = server_url
         self.validate_resource = validate_resource
         self.resource_url = resource_url_from_server_url(server_url)
@@ -55,7 +59,7 @@ class IntrospectionTokenVerifier(TokenVerifier):
                 creds.get("client_secret")
             )
 
-    async def verify_token(self, token: str) -> AccessToken | None:
+    async def verify_token(self, token: str) -> AccessTokenWithClaims | None:
         """Verify token via introspection endpoint."""
         import httpx
 
@@ -97,12 +101,18 @@ class IntrospectionTokenVerifier(TokenVerifier):
                     logger.warning(f"Token resource validation failed. Expected: {self.resource_url}")
                     return None
 
-                return AccessToken(
+                userInfo = await client.get(
+                    self.userinfo_endpoint,
+                    headers=[("Authorization", f"Bearer {token}")],
+                )
+
+                return AccessTokenWithClaims(
                     token=token,
                     client_id=data.get("client_id", self.client_id),
                     scopes=data.get("scope").split(" "),
                     expires_at=data.get("exp"),
                     resource=data.get("aud"),
+                    claims=userInfo.json()
                 )
             except Exception as e:
                 logger.warning(f"Token introspection failed: {e}")
@@ -132,3 +142,4 @@ class IntrospectionTokenVerifier(TokenVerifier):
             return False
 
         return check_resource_allowed(requested_resource=self.resource_url, configured_resource=resource)
+
