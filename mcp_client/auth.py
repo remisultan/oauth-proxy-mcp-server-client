@@ -23,7 +23,7 @@ def create_oauth_provider(server_url: str, scopes:list[str]) -> OAuthClientProvi
 
     client_metadata = OAuthClientMetadata.model_validate(
         {
-            "applicationType": "MCP",
+            "applicationType": "mcp",
             "client_name": f"{getpass.getuser()}'s client",
             "redirect_uris": ["http://localhost:3030/callback"],
             "grant_types": ["authorization_code", "refresh_token"],

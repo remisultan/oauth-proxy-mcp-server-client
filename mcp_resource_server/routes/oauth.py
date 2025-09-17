@@ -3,6 +3,8 @@ from pathlib import Path
 
 import httpx
 from urllib.parse import urlencode
+
+from mcp.server import FastMCP
 from starlette.responses import JSONResponse, RedirectResponse
 
 CREDENTIALS_FILE = Path.home() / ".mcp_server" / "client_credentials.json"
@@ -18,7 +20,7 @@ def load_credentials() -> dict:
             return json.load(f)
     return {}
 
-def register(mcp, settings, token_verifier):
+def register(mcp:FastMCP, settings, token_verifier):
     @mcp.custom_route("/register", methods=["POST"])
     async def register_client(request):
         """Dynamic Client Registration (RFC 7591) with auto-persistence."""
@@ -26,7 +28,11 @@ def register(mcp, settings, token_verifier):
             data = load_credentials()
             if not data:
                 client_metadata = await request.json()
-                client_metadata["tools"] = mcp
+                tool_list = await mcp.list_tools()
+                client_metadata["x_mcp_settings"] = {
+                "url": "http://localhost:8001",
+                "toolDefinitions": [{"name": tool.name, "description": tool.description, "requiredScopes": ["email"]} for tool in tool_list]
+                }
 
                 async with httpx.AsyncClient() as client:
                     response = await client.post(

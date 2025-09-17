@@ -2,7 +2,6 @@ import asyncio
 
 from mcp_client.client import AgentClient
 from settings import ClientSettings
-from client import SimpleAuthClient
 
 
 async def main():

@@ -1,11 +1,5 @@
 import ssl
-from datetime import timedelta
-from pprint import pprint
 from typing import Any
-from mcp.client.session import ClientSession
-from mcp.client.sse import sse_client
-from mcp.client.streamable_http import streamablehttp_client
-from auth import create_oauth_provider
 
 
 class SimpleAuthClient:
@@ -87,7 +81,6 @@ class SimpleAuthClient:
 
 
 import os
-import json
 import aiohttp
 from datetime import timedelta
 from typing import Any
@@ -100,8 +93,8 @@ from auth import create_oauth_provider
 
 class AgentClient:
     """MCP client that integrates with Azure OpenAI Agent via API key."""
-
     def __init__(self, server_url: str, transport_type: str = "streamable_http"):
+        self.tools = []
         self.messages = [
             {"role": "system", "content": "You are an MCP-connected Azure agent."},
         ]
@@ -175,8 +168,7 @@ class AgentClient:
         # Optionally expose MCP tools
         tool_list = []
         if includeTools:
-            result = await self.session.list_tools()
-            for tool in result.tools:
+            for tool in self.tools:
                 tool_list.append({
                     "type": "function",
                     "function": {
@@ -211,11 +203,13 @@ class AgentClient:
 
                 if tool_calls:
                     for function in tool_calls:
+                        self.tools = [tool for tool in self.tools if tool.name != function["function"]["name"]]
                         await self.query_agent(
-                            await self.call_tool(function["function"]["name"], eval(function["function"]["arguments"]))
+                            await self.call_tool(function["function"]["name"], eval(function["function"]["arguments"])),
+                            includeTools= len(self.tools) > 0
                         )
 
-                return await self.query_agent("Give the answer")
+                return await self.query_agent("Give the answer", includeTools=False)
 
 
     async def interactive_loop(self):
@@ -227,6 +221,8 @@ class AgentClient:
             elif cmd.startswith("ask "):
                 prompt = cmd[4:]
                 try:
+                    result = await self.session.list_tools()
+                    self.tools = result.tools
                     self.messages =  [
                         {"role": "system", "content": "You are an MCP-connected Azure agent."},
                     ]
