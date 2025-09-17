@@ -26,6 +26,7 @@ def register(mcp, settings, token_verifier):
             data = load_credentials()
             if not data:
                 client_metadata = await request.json()
+                client_metadata["tools"] = mcp
 
                 async with httpx.AsyncClient() as client:
                     response = await client.post(
