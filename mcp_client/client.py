@@ -173,9 +173,9 @@ class AgentClient:
         }
 
         # Optionally expose MCP tools
-        result = await self.session.list_tools()
         tool_list = []
         if includeTools:
+            result = await self.session.list_tools()
             for tool in result.tools:
                 tool_list.append({
                     "type": "function",
@@ -211,7 +211,9 @@ class AgentClient:
 
                 if tool_calls:
                     for function in tool_calls:
-                        await self.query_agent(await self.call_tool(function["function"]["name"], eval(function["function"]["arguments"])))
+                        await self.query_agent(
+                            await self.call_tool(function["function"]["name"], eval(function["function"]["arguments"]))
+                        )
 
                 return await self.query_agent("Give the answer")
 
